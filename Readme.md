@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Евгений Сажнев](https://up.htmlacademy.ru/javascript/16/user/853069).
-* Наставник: `Неизвестно`.
+* Наставник: [Денис Решетняк](https://htmlacademy.ru/profile/id357).
 
 ---
 
