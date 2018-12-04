@@ -1,13 +1,36 @@
 // Файл setup.js
 'use strict';
 
-var AD_TITLE = ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'];
+var AD_TITLE = ['Большая уютная квартира',
+  'Маленькая неуютная квартира', 'Огромный прекрасный дворец',
+  'Маленький ужасный дворец',
+  'Красивый гостевой домик',
+  'Некрасивый негостеприимный домик',
+  'Уютное бунгало далеко от моря',
+  'Неуютное бунгало по колено в воде'];
 var AD_TYPE = ['palace', 'flat', 'house', 'bungalo'];
 var AD_CHECKIN = ['12:00', '13:00', '14:00'];
 var AD_CHECKOUT = ['12:00', '13:00', '14:00'];
-var AD_FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
-var AD_PHOTOS = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
+var AD_FEATURES = ['wifi',
+  'dishwasher',
+  'parking',
+  'washer',
+  'elevator',
+  'conditioner'];
+var AD_PHOTOS = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg',
+  'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
+  'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
 var PINS_COUNTER = 8;
+
+function getRandomNumberWithoutMin(max) {
+  return Math.floor(Math.random() * max + 1);
+}
+function getRandomElement(array) {
+  var length = array.length;
+  var randomIndex = getRandomNumberWithoutMin(length - 1);
+  return array[randomIndex];
+}
+
 
 // генератор случайного числа в заданном диапазоне
 var getRandomNumber = function (min, max) {
@@ -47,41 +70,44 @@ var getOfferContent = function (title) {
   var offerContent = {};
   offerContent.title = title;
   var location = getLocationContent();
-  offerContent.address = location.x + ', ' + location.y; // в индекс.хтмл в строчке, куда добавляю эти значения адрем написан текстом, но по заданию сюда нужно поставить число. не логично как-то
+  // в индекс.хтмл в строчке, куда добавляю эти значения, адрес
+  // написан текстом, но по заданию сюда нужно поставить число.
+  // не логично как-то
+  offerContent.address = location.x + ', ' + location.y;
   offerContent.price = getRandomNumber(1000, 1000000);
-  offerContent.type = AD_TYPE[getRandomNumber(0, AD_TYPE.length - 1)];
+  offerContent.type = getRandomElement(AD_TYPE);
   offerContent.rooms = getRandomNumber(1, 5);
   offerContent.guests = getRandomNumber(1, 10);
-  offerContent.checkin = AD_CHECKIN[getRandomNumber(0, AD_CHECKIN.length - 1)];
-  offerContent.checkout = AD_CHECKOUT[getRandomNumber(0, AD_CHECKOUT.length - 1)];
+  offerContent.checkin = getRandomElement(AD_CHECKIN);
+  offerContent.checkout = getRandomElement(AD_CHECKOUT);
+
   var features = [];
   for (var i = 0; i < getRandomNumber(0, AD_FEATURES.length - 1); i++) {
     features.push(AD_FEATURES[i]);
   }
   offerContent.features = features;
   offerContent.description = '';
-  var orderOfPhoto = generateArrayRandomNumber(0, AD_PHOTOS.length - 1);
-  var photos = [];
-  for (var j = 0; j < AD_PHOTOS.length; j++) {
-    photos.push(AD_PHOTOS[orderOfPhoto[j]]);
-  }
+  var photoIndexes = generateArrayRandomNumber(0, AD_PHOTOS.length - 1);
+  var photos = photoIndexes.map(function (photoIndex) {
+    return AD_PHOTOS[photoIndex];
+  });
   offerContent.photos = photos;
   return offerContent;
 };
 
 var getLocationContent = function () {
-  var locationContent = {};
-  locationContent.x = getRandomNumber(130, 630) - 20;
-  locationContent.y = getRandomNumber(130, 630) - 40;
-  return locationContent;
+  return {
+    x: getRandomNumber(130, 630) - 20,
+    y: getRandomNumber(130, 730) - 40
+  };
 };
 
 var getSimularAd = function (title) {
-  var simularAd = {};
-  simularAd.author = getAuthorContent();
-  simularAd.offer = getOfferContent(title);
-  simularAd.location = getLocationContent();
-  return simularAd;
+  return {
+    author: getAuthorContent(),
+    offer: getOfferContent(title),
+    location: getLocationContent()
+  };
 };
 
 // функция создания массива объектов меток
@@ -114,9 +140,11 @@ var renderPin = function (pin) {
 
 
 var fragment = document.createDocumentFragment();
-for (var i = 0; i < arrayOfPins.length; i++) {
-  fragment.appendChild(renderPin(arrayOfPins[i]));
-}
+arrayOfPins.forEach(function (pin) {
+  fragment.appendChild(renderPin(pin));
+});
+
+
 pinListElement.appendChild(fragment);
 
 // задание 5
@@ -124,46 +152,48 @@ var cardTemplate = document
                   .querySelector('#card')
                   .content
                   .querySelector('.map__card');
+// функция определения типа жилья метки
+var getPinType = function (offerType) {
+  switch (offerType) {
+    case 'flat': return 'Квартира';
+    case 'bungalo': return 'Бунгало';
+    case 'palace': return 'Дворец';
+    case 'house': return 'Дом';
+    default: throw new Error('Unregognized type of the offer');
+  }
+};
 
-var renderCard = function (array) {
+
+var renderCard = function (pin) {
   var cardElement = cardTemplate.cloneNode(true);
-  cardElement.querySelector('.popup__title').textContent = array.offer.title;
-  cardElement.querySelector('.popup__text--address').textContent = array.offer.address;
-  cardElement.querySelector('.popup__text--price').textContent = array.offer.price + '₽/ночь';
-  if (array.offer.type === 'flat') {
-    cardElement.querySelector('.popup__type').textContent = 'Квартира';
-  }
-  if (array.offer.type === 'bungalo') {
-    cardElement.querySelector('.popup__type').textContent = 'Бунгало';
-  }
-  if (array.offer.type === 'palace') {
-    cardElement.querySelector('.popup__type').textContent = 'Дворец';
-  }
-  if (array.offer.type === 'house') {
-    cardElement.querySelector('.popup__type').textContent = 'Дом';
-  }
+  var offer = pin.offer;
+  cardElement.querySelector('.popup__title').textContent = offer.title;
+  cardElement.querySelector('.popup__text--address').textContent = offer.address;
+  cardElement.querySelector('.popup__text--price').textContent = offer.price + '₽/ночь';
+  cardElement.querySelector('.popup__type').textContent = getPinType(offer.type);
   cardElement.querySelector('.popup__text--capacity').textContent =
-  array.offer.rooms + ' комнаты для ' + array.offer.guests + ' гостей.';
+  offer.rooms + ' комнаты для ' + offer.guests + ' гостей.';
   cardElement.querySelector('.popup__text--time').textContent =
-  'Заезд после ' + array.offer.checkin + ', выезд до ' + array.offer.checkout;
-  cardElement.querySelector('.popup__features').textContent = array.offer.features;
-  cardElement.querySelector('.popup__description').textContent = array.offer.description;
-  cardElement.querySelector('.popup__photo').setAttribute('src', array.offer.photos[0]);
-  var img1 = cardElement.querySelector('.popup__photo').cloneNode(true);
-  img1.setAttribute('src', array.offer.photos[1]);
-  cardElement.querySelector('.popup__photos').appendChild(img1);
-  var img2 = cardElement.querySelector('.popup__photo').cloneNode(true);
-  img2.setAttribute('src', array.offer.photos[2]);
-  cardElement.querySelector('.popup__photos').appendChild(img2);
-  cardElement.querySelector('.popup__avatar').setAttribute('src', array.author.avatar);
+  'Заезд после ' + offer.checkin + ', выезд до ' + offer.checkout;
+  cardElement.querySelector('.popup__features').textContent = offer.features;
+  cardElement.querySelector('.popup__description').textContent = offer.description;
+  var cardPhotoElement = cardElement.querySelector('.popup__photo');
+  cardPhotoElement.setAttribute('src', offer.photos[0]);
+  var photoOne = cardPhotoElement.cloneNode(true);
+  photoOne.setAttribute('src', offer.photos[1]);
+  cardElement.querySelector('.popup__photos').appendChild(photoOne);
+  var photoTwo = cardPhotoElement.cloneNode(true);
+  photoTwo.setAttribute('src', offer.photos[2]);
+  cardElement.querySelector('.popup__photos').appendChild(photoTwo);
+  cardElement.querySelector('.popup__avatar').setAttribute('src', pin.author.avatar);
   return cardElement;
 };
 
 var cardListElement = userDialog.querySelector('.map__pins');
-
-
 var cards = document.createDocumentFragment();
-for (var k = 0; k < arrayOfPins.length; k++) {
-  cards.appendChild(renderCard(arrayOfPins[k]));
-}
+
+arrayOfPins.forEach(function (pin) {
+  cards.appendChild(renderCard(pin));
+});
+
 cardListElement.appendChild(cards);
