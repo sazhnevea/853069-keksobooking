@@ -124,7 +124,6 @@ var getArrayOfPins = function (counter) {
 var arrayOfPins = getArrayOfPins(PINS_COUNTER);
 var userDialog = document.querySelector('.map');
 userDialog.classList.remove('map--faded');
-
 var pinListElement = userDialog.querySelector('.map__pins');
 var pinTemplate = document
                   .querySelector('#pin')
@@ -164,52 +163,84 @@ var getPinType = function (offerType) {
   }
 };
 
-var renderTextContentForCard = function (pin) {
-  var cardElement = cardTemplate.cloneNode(true);
+var renderCard = function (template, pin) {
+  var cardElement = template.cloneNode(true);
   var offer = pin.offer;
-  cardElement.querySelector('.popup__title').textContent = offer.title;
-  cardElement.querySelector('.popup__text--address').textContent = offer.address;
-  cardElement.querySelector('.popup__text--price').textContent = offer.price + '₽/ночь';
-  cardElement.querySelector('.popup__type').textContent = getPinType(offer.type);
-  cardElement.querySelector('.popup__text--capacity').textContent =
-  offer.rooms + ' комнаты для ' + offer.guests + ' гостей.';
-  cardElement.querySelector('.popup__text--time').textContent =
-  'Заезд после ' + offer.checkin + ', выезд до ' + offer.checkout;
-  cardElement.querySelector('.popup__features').textContent = offer.features;
-  cardElement.querySelector('.popup__description').textContent = offer.description;
+  var author = pin.author;
+  setTitle(cardElement, offer.title);
+  setAddress(cardElement, offer.address);
+  setPrice(cardElement, offer.price);
+  setType(cardElement, offer.type);
+  setCapacity(cardElement, offer.rooms, offer.guests);
+  setTime(cardElement, offer.checkin, offer.checkout);
+  setFeatures(cardElement, offer.features);
+  setDescription(cardElement, offer.description);
+  setPhotos(cardElement, offer.photos);
+  setAvatar(cardElement, author.avatar);
   return cardElement;
 };
 
+function setTitle(cardElement, title) {
+  var titleContext = cardElement.querySelector('.popup__title');
+  titleContext.textContent = title;
+}
 
-var renderPhotoForCard = function (pin) {
-  var cardElement = cardTemplate.cloneNode(true);
-  var offer = pin.offer;
-  var cardPhotoElement = cardElement.querySelector('.popup__photo');
-  cardPhotoElement.setAttribute('src', offer.photos[0]);
-  var photoOne = cardPhotoElement.cloneNode(true);
-  photoOne.setAttribute('src', offer.photos[1]);
-  cardElement.querySelector('.popup__photos').appendChild(photoOne);
-  var photoTwo = cardPhotoElement.cloneNode(true);
-  photoTwo.setAttribute('src', offer.photos[2]);
-  cardElement.querySelector('.popup__photos').appendChild(photoTwo);
-  return cardElement.querySelector('.popup__photos');
-};
+function setAddress(cardElement, address) {
+  var addressContext = cardElement.querySelector('.popup__text--address');
+  addressContext.textContent = address;
+}
 
-var renderCard = function (pin) {
-  var cardElement = cardTemplate.cloneNode(true);
-  cardElement = renderTextContentForCard(pin);
-  var popupPhotos = cardElement.querySelector('.popup__photos');
-  cardElement.removeChild(popupPhotos);
-  cardElement.appendChild(renderPhotoForCard(pin));
-  cardElement.querySelector('.popup__avatar').setAttribute('src', pin.author.avatar);
-  return cardElement;
-};
+function setPrice(cardElement, price) {
+  var priceContext = cardElement.querySelector('.popup__text--price');
+  priceContext.textContent = price + '₽/ночь';
+}
+
+function setType(cardElement, type) {
+  var typeContext = cardElement.querySelector('.popup__type');
+  typeContext.textContent = getPinType(type);
+}
+
+function setCapacity(cardElement, rooms, guests) {
+  var capacityContext = cardElement.querySelector('.popup__text--capacity');
+  capacityContext.textContent = rooms + ' комнаты для ' + guests + ' гостей.';
+}
+
+function setTime(cardElement, checkin, checkout) {
+  var timeContext = cardElement.querySelector('.popup__text--time');
+  timeContext.textContent = 'Заезд после ' + checkin + ', выезд до ' + checkout;
+}
+
+function setFeatures(cardElement, features) {
+  var featuresContext = cardElement.querySelector('.popup__features');
+  featuresContext.textContent = features;
+}
+
+function setDescription(cardElement, description) {
+  var descriptionContext = cardElement.querySelector('.popup__description');
+  descriptionContext.textContent = description;
+}
+
+function setPhotos(cardElement, photos) {
+  var cardPhotosElements = cardElement.querySelector('.popup__photos');
+  var cardPhotoElement = cardPhotosElements.querySelector('.popup__photo');
+  cardPhotoElement.remove();
+  for (var i = 0; i < photos.length; i++) {
+    var photoElementToAppend = cardPhotoElement.cloneNode(true);
+    photoElementToAppend.setAttribute('src', photos[i]);
+    cardPhotosElements.appendChild(photoElementToAppend);
+  }
+}
+
+function setAvatar(cardElement, avatar) {
+  var avatarURL = cardElement.querySelector('.popup__avatar');
+  avatarURL.setAttribute('src', avatar);
+}
 
 var cardListElement = userDialog.querySelector('.map__pins');
 var cards = document.createDocumentFragment();
 
 arrayOfPins.forEach(function (pin) {
-  cards.appendChild(renderCard(pin));
+  cards.appendChild(renderCard(cardTemplate, pin));
 });
 
 cardListElement.appendChild(cards);
