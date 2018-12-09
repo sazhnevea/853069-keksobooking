@@ -123,7 +123,6 @@ var getArrayOfPins = function (counter) {
 // массив объектов меток
 var arrayOfPins = getArrayOfPins(PINS_COUNTER);
 var userDialog = document.querySelector('.map');
-userDialog.classList.remove('map--faded');
 var pinListElement = userDialog.querySelector('.map__pins');
 var pinTemplate = document
                   .querySelector('#pin')
@@ -144,8 +143,9 @@ arrayOfPins.forEach(function (pin) {
   fragment.appendChild(renderPin(pin));
 });
 
-
-pinListElement.appendChild(fragment);
+function addPinsToDom() {
+  pinListElement.appendChild(fragment);
+}
 
 // задание 5
 var cardTemplate = document
@@ -179,6 +179,14 @@ var renderCard = function (template, pin) {
   setAvatar(cardElement, author.avatar);
   return cardElement;
 };
+
+var cardListElement = userDialog.querySelector('.map__pins');
+var cards = document.createDocumentFragment();
+
+var getCard = function (arrayElement) {
+  return cards.appendChild(renderCard(cardTemplate, arrayElement));
+};
+cardListElement.appendChild(cards);
 
 function setTitle(cardElement, title) {
   var titleContext = cardElement.querySelector('.popup__title');
@@ -236,11 +244,74 @@ function setAvatar(cardElement, avatar) {
   avatarURL.setAttribute('src', avatar);
 }
 
-var cardListElement = userDialog.querySelector('.map__pins');
-var cards = document.createDocumentFragment();
+var address = document.querySelector('#address');
+address.placeholder = '590, 395';
 
-arrayOfPins.forEach(function (pin) {
-  cards.appendChild(renderCard(cardTemplate, pin));
+// задание 16.1
+
+var adForm = document.querySelector('.ad-form');
+var adFormFieldset = adForm.querySelectorAll('fieldset');
+var mapFilters = document.querySelector('.map__filters');
+var mapFiltersSelect = mapFilters.querySelectorAll('select, fieldset');
+
+function removeDisables(element) {
+  element.removeAttribute('disabled');
+}
+
+var ellipseHandle = userDialog.querySelector('ellipse');
+var muffinHandle = userDialog.querySelector('img');
+
+muffinHandle.addEventListener('mouseup', function (evt) {
+  evt.preventDefault();
+  adFormFieldset.forEach(removeDisables);
+  mapFiltersSelect.forEach(removeDisables);
+  userDialog.classList.remove('map--faded');
+  adForm.classList.remove('ad-form--disabled');
+  address.placeholder = '590, 441';
+  addPinsToDom();
 });
 
-cardListElement.appendChild(cards);
+ellipseHandle.addEventListener('mouseup', function (evt) {
+  evt.preventDefault();
+  adFormFieldset.forEach(removeDisables);
+  mapFiltersSelect.forEach(removeDisables);
+  userDialog.classList.remove('map--faded');
+  adForm.classList.remove('ad-form--disabled');
+  address.placeholder = '590, 441';
+  addPinsToDom();
+});
+
+var closeOpenedCard = function () {
+  var closeCard = document.querySelector('.map__card .popup');
+  var closeCardButton = document.querySelector('.popup__close');
+  closeCardButton.addEventListener('click', function () {
+    closeCard.remove();
+    pinListElement.addEventListener('click', pinListElement.onclick());
+  });
+};
+
+pinListElement.onclick = function (evt) {
+  var target = evt.target;
+  // на каком теге был клик?
+  var clickedTag = evt.target.tagName;
+  var clickedTagClass = evt.target.classList;
+  // выбираем только нужные теги
+  if (clickedTag === 'IMG' || clickedTag === 'BUTTON') {
+    if (clickedTag === 'BUTTON' && clickedTagClass === 'map__pin') {
+      target = target.querySelector('img');
+    }
+    var src = target.getAttribute('src');
+    // находим в массиве элемент, на котором был клик
+    for (var i = 0; i < arrayOfPins.length; i++) {
+      if (arrayOfPins[i].author.avatar === src) {
+        // рендерим и добавляем в дом нужную карточку
+        getCard(arrayOfPins[i]);
+        cardListElement.appendChild(cards);
+        var location = arrayOfPins[i].location;
+        address.placeholder = location.x + ', ' + location.y;
+        closeOpenedCard();
+      }
+    }
+  }
+};
+
