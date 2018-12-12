@@ -309,8 +309,8 @@ var getClickedPinSrc = function (evt) {
       target = target.querySelector('img');
     }
     var src = target.getAttribute('src');
-    return src;
   }
+  return src;
 };
 
 pinListElement.onclick = function (evt) {
