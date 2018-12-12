@@ -61,9 +61,9 @@ function generateArrayRandomNumber(min, max) {
 
 
 // наполняем объявление содержимым
-var getAuthorContent = function () {
+var getAuthorContent = function (index) {
   var AuthorContent = {};
-  AuthorContent.avatar = 'img/avatars/user0' + getRandomNumber(1, 8) + '.png';
+  AuthorContent.avatar = 'img/avatars/user0' + index + '.png';
   return AuthorContent;
 };
 
@@ -103,9 +103,9 @@ var getLocationContent = function () {
   };
 };
 
-var getSimilarAd = function (title) {
+var getSimilarAd = function (title, index) {
   return {
-    author: getAuthorContent(),
+    author: getAuthorContent(index),
     offer: getOfferContent(title),
     location: getLocationContent()
   };
@@ -115,7 +115,7 @@ var getSimilarAd = function (title) {
 var getArrayOfPins = function (counter) {
   var arrayOfPins = [];
   for (var i = 0; i < counter; i++) {
-    arrayOfPins[i] = getSimilarAd(AD_TITLE[i]);
+    arrayOfPins[i] = getSimilarAd(AD_TITLE[i], i + 1);
   }
   return arrayOfPins;
 };
@@ -128,7 +128,6 @@ var pinTemplate = document
                   .querySelector('#pin')
                   .content
                   .querySelector('.map__pin');
-
 var renderPin = function (pin) {
   var pinElement = pinTemplate.cloneNode(true);
   pinElement.setAttribute('style', 'left: ' + pin.location.x + 'px; top: ' + pin.location.y + 'px;');
@@ -163,10 +162,16 @@ var getPinType = function (offerType) {
   }
 };
 
+
 var renderCard = function (template, pin) {
+  function removeCard() {
+    cardElement.removeEventListener('click', removeCard);
+    cardElement.remove();
+  }
   var cardElement = template.cloneNode(true);
   var offer = pin.offer;
   var author = pin.author;
+  cardElement.querySelector('.popup__close').addEventListener('click', removeCard);
   setTitle(cardElement, offer.title);
   setAddress(cardElement, offer.address);
   setPrice(cardElement, offer.price);
@@ -183,8 +188,8 @@ var renderCard = function (template, pin) {
 var cardListElement = userDialog.querySelector('.map__pins');
 var cards = document.createDocumentFragment();
 
-var getCard = function (arrayElement) {
-  return cards.appendChild(renderCard(cardTemplate, arrayElement));
+var getCard = function (card) {
+  return cards.appendChild(renderCard(cardTemplate, card));
 };
 cardListElement.appendChild(cards);
 
@@ -254,64 +259,69 @@ var adFormFieldset = adForm.querySelectorAll('fieldset');
 var mapFilters = document.querySelector('.map__filters');
 var mapFiltersSelect = mapFilters.querySelectorAll('select, fieldset');
 
-function removeDisables(element) {
+function removeDisabledAttr(element) {
   element.removeAttribute('disabled');
 }
 
 var ellipseHandle = userDialog.querySelector('ellipse');
 var muffinHandle = userDialog.querySelector('img');
 
-muffinHandle.addEventListener('mouseup', function (evt) {
-  evt.preventDefault();
-  adFormFieldset.forEach(removeDisables);
-  mapFiltersSelect.forEach(removeDisables);
+
+function activatePage() {
+  adFormFieldset.forEach(removeDisabledAttr);
+  mapFiltersSelect.forEach(removeDisabledAttr);
   userDialog.classList.remove('map--faded');
   adForm.classList.remove('ad-form--disabled');
   address.placeholder = '590, 441';
   addPinsToDom();
+  address.parentNode.setAttribute('disabled', '');
+}
+
+muffinHandle.addEventListener('mouseup', function () {
+  activatePage();
 });
 
-ellipseHandle.addEventListener('mouseup', function (evt) {
-  evt.preventDefault();
-  adFormFieldset.forEach(removeDisables);
-  mapFiltersSelect.forEach(removeDisables);
-  userDialog.classList.remove('map--faded');
-  adForm.classList.remove('ad-form--disabled');
-  address.placeholder = '590, 441';
-  addPinsToDom();
+ellipseHandle.addEventListener('mouseup', function () {
+  activatePage();
 });
+
+var ESC_KEYCODE = 27;
 
 var closeOpenedCard = function () {
-  var closeCard = document.querySelector('.map__card .popup');
-  var closeCardButton = document.querySelector('.popup__close');
-  closeCardButton.addEventListener('click', function () {
-    closeCard.remove();
-    pinListElement.addEventListener('click', pinListElement.onclick());
-  });
+  var closeCard = document.querySelector('.map__card');
+  closeCard.remove();
 };
 
-pinListElement.onclick = function (evt) {
+var onPopupEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    closeOpenedCard();
+  }
+};
+
+document.addEventListener('keydown', onPopupEscPress);
+
+var getClickedPinSrc = function (evt) {
   var target = evt.target;
-  // на каком теге был клик?
   var clickedTag = evt.target.tagName;
   var clickedTagClass = evt.target.classList;
-  // выбираем только нужные теги
   if (clickedTag === 'IMG' || clickedTag === 'BUTTON') {
     if (clickedTag === 'BUTTON' && clickedTagClass === 'map__pin') {
       target = target.querySelector('img');
     }
     var src = target.getAttribute('src');
-    // находим в массиве элемент, на котором был клик
-    for (var i = 0; i < arrayOfPins.length; i++) {
-      if (arrayOfPins[i].author.avatar === src) {
-        // рендерим и добавляем в дом нужную карточку
-        getCard(arrayOfPins[i]);
-        cardListElement.appendChild(cards);
-        var location = arrayOfPins[i].location;
-        address.placeholder = location.x + ', ' + location.y;
-        closeOpenedCard();
-      }
-    }
+    return src;
   }
 };
 
+pinListElement.onclick = function (evt) {
+  for (var i = 0; i < arrayOfPins.length; i++) {
+    if (arrayOfPins[i].author.avatar === getClickedPinSrc(evt)) {
+      // рендерим и добавляем в дом нужную карточку
+      getCard(arrayOfPins[i]);
+      cardListElement.appendChild(cards);
+      // сделать функцию
+      var location = arrayOfPins[i].location;
+      address.placeholder = location.x + ', ' + location.y;
+    }
+  }
+};
