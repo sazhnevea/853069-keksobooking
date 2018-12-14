@@ -20,7 +20,6 @@ var AD_FEATURES = ['wifi',
 var AD_PHOTOS = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg',
   'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
   'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
-var PINS_COUNTER = 8;
 
 function getRandomElement(array) {
   var length = array.length;
@@ -61,9 +60,9 @@ function generateArrayRandomNumber(min, max) {
 
 
 // наполняем объявление содержимым
-var getAuthorContent = function () {
+var getAuthorContent = function (index) {
   var AuthorContent = {};
-  AuthorContent.avatar = 'img/avatars/user0' + getRandomNumber(1, 8) + '.png';
+  AuthorContent.avatar = 'img/avatars/user0' + index + '.png';
   return AuthorContent;
 };
 
@@ -103,35 +102,32 @@ var getLocationContent = function () {
   };
 };
 
-var getSimilarAd = function (title) {
+var getSimilarAd = function (title, index) {
   return {
-    author: getAuthorContent(),
+    author: getAuthorContent(index),
     offer: getOfferContent(title),
     location: getLocationContent()
   };
 };
 
-// функция создания массива объектов меток
-var getArrayOfPins = function (counter) {
-  var arrayOfPins = [];
-  for (var i = 0; i < counter; i++) {
-    arrayOfPins[i] = getSimilarAd(AD_TITLE[i]);
-  }
-  return arrayOfPins;
-};
+function getPins(titles) {
+  return titles.map(function (title, i) {
+    return getSimilarAd(title, i + 1);
+  });
+}
+
 
 // массив объектов меток
-var arrayOfPins = getArrayOfPins(PINS_COUNTER);
+var pins = getPins(AD_TITLE);
 var userDialog = document.querySelector('.map');
-userDialog.classList.remove('map--faded');
 var pinListElement = userDialog.querySelector('.map__pins');
 var pinTemplate = document
                   .querySelector('#pin')
                   .content
                   .querySelector('.map__pin');
-
-var renderPin = function (pin) {
+var renderPin = function (pin, index) {
   var pinElement = pinTemplate.cloneNode(true);
+  pinElement.setAttribute('data-index', index);
   pinElement.setAttribute('style', 'left: ' + pin.location.x + 'px; top: ' + pin.location.y + 'px;');
   pinElement.querySelector('img').setAttribute('src', pin.author.avatar);
   pinElement.setAttribute('alt', pin.offer.title);
@@ -140,12 +136,13 @@ var renderPin = function (pin) {
 
 
 var fragment = document.createDocumentFragment();
-arrayOfPins.forEach(function (pin) {
-  fragment.appendChild(renderPin(pin));
+pins.forEach(function (pin, index) {
+  fragment.appendChild(renderPin(pin, index));
 });
 
-
-pinListElement.appendChild(fragment);
+function addPinsToDom() {
+  pinListElement.appendChild(fragment);
+}
 
 // задание 5
 var cardTemplate = document
@@ -163,10 +160,16 @@ var getPinType = function (offerType) {
   }
 };
 
+
 var renderCard = function (template, pin) {
+  function removeCard() {
+    cardElement.removeEventListener('click', removeCard);
+    cardElement.remove();
+  }
   var cardElement = template.cloneNode(true);
   var offer = pin.offer;
   var author = pin.author;
+  cardElement.querySelector('.popup__close').addEventListener('click', removeCard);
   setTitle(cardElement, offer.title);
   setAddress(cardElement, offer.address);
   setPrice(cardElement, offer.price);
@@ -179,6 +182,14 @@ var renderCard = function (template, pin) {
   setAvatar(cardElement, author.avatar);
   return cardElement;
 };
+
+var cardListElement = userDialog.querySelector('.map__pins');
+var cards = document.createDocumentFragment();
+
+var getCardToDom = function (card) {
+  return cards.appendChild(renderCard(cardTemplate, card));
+};
+cardListElement.appendChild(cards);
 
 function setTitle(cardElement, title) {
   var titleContext = cardElement.querySelector('.popup__title');
@@ -236,11 +247,81 @@ function setAvatar(cardElement, avatar) {
   avatarURL.setAttribute('src', avatar);
 }
 
-var cardListElement = userDialog.querySelector('.map__pins');
-var cards = document.createDocumentFragment();
+var address = document.querySelector('#address');
+address.placeholder = '590, 395';
 
-arrayOfPins.forEach(function (pin) {
-  cards.appendChild(renderCard(cardTemplate, pin));
+// задание 16.1
+
+var adForm = document.querySelector('.ad-form');
+var adFormFieldset = adForm.querySelectorAll('fieldset');
+var mapFilters = document.querySelector('.map__filters');
+var mapFiltersSelect = mapFilters.querySelectorAll('select, fieldset');
+
+function removeDisabledAttr(element) {
+  element.removeAttribute('disabled');
+}
+
+var ellipseHandle = userDialog.querySelector('ellipse');
+var muffinHandle = userDialog.querySelector('img');
+
+
+function activatePage() {
+  adFormFieldset.forEach(removeDisabledAttr);
+  mapFiltersSelect.forEach(removeDisabledAttr);
+  userDialog.classList.remove('map--faded');
+  adForm.classList.remove('ad-form--disabled');
+  address.placeholder = '590, 441';
+  addPinsToDom();
+  address.parentNode.setAttribute('disabled', '');
+}
+
+muffinHandle.addEventListener('mouseup', function () {
+  activatePage();
 });
 
-cardListElement.appendChild(cards);
+ellipseHandle.addEventListener('mouseup', function () {
+  activatePage();
+});
+
+var ESC_KEYCODE = 27;
+
+var closeOpenedCard = function () {
+  var closeCard = document.querySelector('.map__card');
+  closeCard.remove();
+};
+
+var onPopupEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    closeOpenedCard();
+  }
+};
+
+document.addEventListener('keydown', onPopupEscPress);
+
+var getClickedPin = function (evt) {
+  var target = evt.target;
+  var clickedTag = evt.target.tagName;
+  if (clickedTag === 'IMG' || clickedTag === 'BUTTON') {
+    if (clickedTag === 'IMG') {
+      target = target.parentNode;
+    }
+    var dataIndex = target.getAttribute('data-index');
+  }
+  return dataIndex;
+};
+
+function setPinLocationToAddress(index) {
+  address.placeholder = pins[index].location.x + ', ' + pins[index].location.y;
+}
+
+pinListElement.onclick = function (evt) {
+  var dataIndex = getClickedPin(evt);
+  getCardToDom(pins[dataIndex]);
+  cardListElement.appendChild(cards);
+  // сделать функцию
+  setPinLocationToAddress(dataIndex);
+
+
+};
+
+
