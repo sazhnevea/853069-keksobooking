@@ -318,10 +318,103 @@ pinListElement.onclick = function (evt) {
   var dataIndex = getClickedPin(evt);
   getCardToDom(pins[dataIndex]);
   cardListElement.appendChild(cards);
-  // сделать функцию
   setPinLocationToAddress(dataIndex);
-
-
 };
 
+// Задание 17
 
+function setMinPrice(value) {
+  adForm.querySelector('#price').setAttribute('min', value);
+  adForm.querySelector('#price').setAttribute('placeholder', value);
+}
+
+var getMinPrice = function (type) {
+  switch (type) {
+    case 'Квартира': return '1000';
+    case 'Бунгало': return '0';
+    case 'Дворец': return '10000';
+    case 'Дом': return '5000';
+    default: throw new Error('Unrecognized type of the type');
+  }
+};
+
+var accomondationTypeList = document.querySelector('#type');
+
+accomondationTypeList.addEventListener('change', function () {
+  setMinPrice(getMinPrice(getPinType(accomondationTypeList.value)));
+});
+
+setMinPrice(getMinPrice(getPinType(accomondationTypeList.value)));
+
+
+var checkIn = document.getElementById('timein');
+var checkOut = document.getElementById('timeout');
+
+function checkInOutSwitcher(changedElement, elementToChange) {
+  elementToChange.selectedIndex = changedElement.selectedIndex;
+}
+
+checkIn.addEventListener('change', function () {
+  checkInOutSwitcher(checkIn, checkOut);
+});
+
+checkOut.addEventListener('change', function () {
+  checkInOutSwitcher(checkOut, checkIn);
+});
+
+
+var roomNumber = document.getElementById('room_number');
+var capacity = document.getElementById('capacity');
+
+var roomsMap = {
+  1: [0, 1, 3],
+  2: [3, 0],
+  3: [3],
+  100: [1, 2, 0]
+};
+var roomNumbersDisablesReset = [0, 1, 2, 3];
+
+function setDisableAttribute(v) {
+  var optionIndexesToDisable = roomsMap[v]; // получаем массив индексов, которые нужно задизейблить
+  optionIndexesToDisable.forEach(function (index) {
+    capacity.children[index].setAttribute('disabled', '');
+  });
+}
+
+function resetDisables() {
+  roomNumbersDisablesReset.forEach(function (index) {
+    capacity.children[index].removeAttribute('disabled', '');
+  });
+}
+
+roomNumber.addEventListener('change', function () {
+  resetDisables();
+  var roomNumberValue = roomNumber.value;
+  setDisableAttribute(roomNumberValue);
+});
+
+var userTitleInput = document.getElementById('title');
+userTitleInput.addEventListener('invalid', function () {
+  if (userTitleInput.validity.tooShort) {
+    userTitleInput.setCustomValidity('Имя должно состоять минимум из 30-х символов');
+  } else if (userTitleInput.validity.tooLong) {
+    userTitleInput.setCustomValidity('Имя не должно превышать 100-та символов');
+  } else if (userTitleInput.validity.valueMissing) {
+    userTitleInput.setCustomValidity('Обязательное поле');
+  } else {
+    userTitleInput.setCustomValidity('');
+  }
+});
+
+userTitleInput.addEventListener('input', function (evt) {
+  var target = evt.target;
+  if (target.value.length < 30) {
+    target.setCustomValidity('Имя должно состоять минимум из 30-х символов');
+  } else if (target.value.length > 100) {
+    target.setCustomValidity('Имя не должно превышать 100-та символов');
+  } else if (userTitleInput.validity.valueMissing) {
+    target.setCustomValidity('Обязательное поле');
+  } else {
+    target.setCustomValidity('');
+  }
+});
