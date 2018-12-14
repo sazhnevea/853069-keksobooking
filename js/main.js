@@ -20,7 +20,6 @@ var AD_FEATURES = ['wifi',
 var AD_PHOTOS = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg',
   'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
   'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
-var PINS_COUNTER = 8;
 
 function getRandomElement(array) {
   var length = array.length;
@@ -111,25 +110,24 @@ var getSimilarAd = function (title, index) {
   };
 };
 
-// функция создания массива объектов меток
-var getArrayOfPins = function (counter) {
-  var arrayOfPins = [];
-  for (var i = 0; i < counter; i++) {
-    arrayOfPins[i] = getSimilarAd(AD_TITLE[i], i + 1);
-  }
-  return arrayOfPins;
-};
+function getPins(titles) {
+  return titles.map(function (title, i) {
+    return getSimilarAd(title, i + 1);
+  });
+}
+
 
 // массив объектов меток
-var arrayOfPins = getArrayOfPins(PINS_COUNTER);
+var pins = getPins(AD_TITLE);
 var userDialog = document.querySelector('.map');
 var pinListElement = userDialog.querySelector('.map__pins');
 var pinTemplate = document
                   .querySelector('#pin')
                   .content
                   .querySelector('.map__pin');
-var renderPin = function (pin) {
+var renderPin = function (pin, index) {
   var pinElement = pinTemplate.cloneNode(true);
+  pinElement.setAttribute('data-index', index);
   pinElement.setAttribute('style', 'left: ' + pin.location.x + 'px; top: ' + pin.location.y + 'px;');
   pinElement.querySelector('img').setAttribute('src', pin.author.avatar);
   pinElement.setAttribute('alt', pin.offer.title);
@@ -138,8 +136,8 @@ var renderPin = function (pin) {
 
 
 var fragment = document.createDocumentFragment();
-arrayOfPins.forEach(function (pin) {
-  fragment.appendChild(renderPin(pin));
+pins.forEach(function (pin, index) {
+  fragment.appendChild(renderPin(pin, index));
 });
 
 function addPinsToDom() {
@@ -188,7 +186,7 @@ var renderCard = function (template, pin) {
 var cardListElement = userDialog.querySelector('.map__pins');
 var cards = document.createDocumentFragment();
 
-var getCard = function (card) {
+var getCardToDom = function (card) {
   return cards.appendChild(renderCard(cardTemplate, card));
 };
 cardListElement.appendChild(cards);
@@ -300,28 +298,30 @@ var onPopupEscPress = function (evt) {
 
 document.addEventListener('keydown', onPopupEscPress);
 
-var getClickedPinSrc = function (evt) {
+var getClickedPin = function (evt) {
   var target = evt.target;
   var clickedTag = evt.target.tagName;
-  var clickedTagClass = evt.target.classList;
   if (clickedTag === 'IMG' || clickedTag === 'BUTTON') {
-    if (clickedTag === 'BUTTON' && clickedTagClass === 'map__pin') {
-      target = target.querySelector('img');
+    if (clickedTag === 'IMG') {
+      target = target.parentNode;
     }
-    var src = target.getAttribute('src');
+    var dataIndex = target.getAttribute('data-index');
   }
-  return src;
+  return dataIndex;
 };
 
+function setPinLocationToAddress(index) {
+  address.placeholder = pins[index].location.x + ', ' + pins[index].location.y;
+}
+
 pinListElement.onclick = function (evt) {
-  for (var i = 0; i < arrayOfPins.length; i++) {
-    if (arrayOfPins[i].author.avatar === getClickedPinSrc(evt)) {
-      // рендерим и добавляем в дом нужную карточку
-      getCard(arrayOfPins[i]);
-      cardListElement.appendChild(cards);
-      // сделать функцию
-      var location = arrayOfPins[i].location;
-      address.placeholder = location.x + ', ' + location.y;
-    }
-  }
+  var dataIndex = getClickedPin(evt);
+  getCardToDom(pins[dataIndex]);
+  cardListElement.appendChild(cards);
+  // сделать функцию
+  setPinLocationToAddress(dataIndex);
+
+
 };
+
+
