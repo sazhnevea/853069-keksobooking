@@ -249,6 +249,8 @@ function setAvatar(cardElement, avatar) {
 var address = document.querySelector('#address');
 address.placeholder = '590, 395';
 
+
+
 // задание 16.1
 
 var adForm = document.querySelector('.ad-form');
@@ -262,6 +264,18 @@ function removeDisabledAttr(element) {
 
 var mainPin = userDialog.querySelector('.map__pin--main');
 
+function addAddressHiddenInput() {
+  var hiddenInput = document.createElement('input');
+  hiddenInput.setAttribute('type', 'hidden');
+  hiddenInput.setAttribute('value', address.placeholder);
+  hiddenInput.setAttribute('name', 'address');
+  address.parentNode.appendChild(hiddenInput);
+}
+
+function removeAddressVilibleAttr() {
+  address.removeAttribute('name');
+}
+
 function activatePage() {
   adFormFieldset.forEach(removeDisabledAttr);
   mapFiltersSelect.forEach(removeDisabledAttr);
@@ -269,7 +283,9 @@ function activatePage() {
   adForm.classList.remove('ad-form--disabled');
   address.placeholder = '590, 441';
   addPinsToDom();
-  address.parentNode.setAttribute('disabled', '');
+  address.setAttribute('disabled', '');
+  removeAddressVilibleAttr();
+  addAddressHiddenInput();
 }
 
 mainPin.addEventListener('mouseup', function () {
@@ -435,3 +451,5 @@ userTitleInput.addEventListener('input', function (evt) {
   }
   target.setCustomValidity(message);
 });
+
+address.parentNode.removeAttribute('disabled');
