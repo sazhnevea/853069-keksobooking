@@ -263,11 +263,8 @@ function removeDisabledAttr(element) {
 var mainPin = userDialog.querySelector('.map__pin--main');
 
 function addAddressHiddenInput() {
-  var hiddenInput = document.createElement('input');
-  hiddenInput.setAttribute('type', 'hidden');
+  var hiddenInput = document.getElementById('address_hidden');
   hiddenInput.setAttribute('value', address.placeholder);
-  hiddenInput.setAttribute('name', 'address');
-  address.parentNode.appendChild(hiddenInput);
 }
 
 function activatePage() {
