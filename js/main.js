@@ -270,11 +270,6 @@ function addAddressHiddenInput() {
   address.parentNode.appendChild(hiddenInput);
 }
 
-function removeAddressVilibleAttrs() {
-  address.removeAttribute('name');
-  address.parentNode.removeAttribute('disabled');
-}
-
 function activatePage() {
   adFormFieldset.forEach(removeDisabledAttr);
   mapFiltersSelect.forEach(removeDisabledAttr);
@@ -283,7 +278,6 @@ function activatePage() {
   address.placeholder = '590, 441';
   addPinsToDom();
   address.setAttribute('disabled', '');
-  removeAddressVilibleAttrs();
   addAddressHiddenInput();
 }
 
