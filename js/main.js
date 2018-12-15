@@ -249,8 +249,6 @@ function setAvatar(cardElement, avatar) {
 var address = document.querySelector('#address');
 address.placeholder = '590, 395';
 
-
-
 // задание 16.1
 
 var adForm = document.querySelector('.ad-form');
@@ -272,8 +270,9 @@ function addAddressHiddenInput() {
   address.parentNode.appendChild(hiddenInput);
 }
 
-function removeAddressVilibleAttr() {
+function removeAddressVilibleAttrs() {
   address.removeAttribute('name');
+  address.parentNode.removeAttribute('disabled');
 }
 
 function activatePage() {
@@ -284,7 +283,7 @@ function activatePage() {
   address.placeholder = '590, 441';
   addPinsToDom();
   address.setAttribute('disabled', '');
-  removeAddressVilibleAttr();
+  removeAddressVilibleAttrs();
   addAddressHiddenInput();
 }
 
@@ -451,5 +450,3 @@ userTitleInput.addEventListener('input', function (evt) {
   }
   target.setCustomValidity(message);
 });
-
-address.parentNode.removeAttribute('disabled');
