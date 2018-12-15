@@ -134,7 +134,6 @@ var renderPin = function (pin, index) {
   return pinElement;
 };
 
-
 var fragment = document.createDocumentFragment();
 pins.forEach(function (pin, index) {
   fragment.appendChild(renderPin(pin, index));
@@ -261,9 +260,7 @@ function removeDisabledAttr(element) {
   element.removeAttribute('disabled');
 }
 
-var ellipseHandle = userDialog.querySelector('ellipse');
-var muffinHandle = userDialog.querySelector('img');
-
+var mainPin = userDialog.querySelector('.map__pin--main');
 
 function activatePage() {
   adFormFieldset.forEach(removeDisabledAttr);
@@ -275,11 +272,7 @@ function activatePage() {
   address.parentNode.setAttribute('disabled', '');
 }
 
-muffinHandle.addEventListener('mouseup', function () {
-  activatePage();
-});
-
-ellipseHandle.addEventListener('mouseup', function () {
+mainPin.addEventListener('mouseup', function () {
   activatePage();
 });
 
@@ -287,7 +280,9 @@ var ESC_KEYCODE = 27;
 
 var closeOpenedCard = function () {
   var closeCard = document.querySelector('.map__card');
-  closeCard.remove();
+  if (closeCard) {
+    closeCard.remove();
+  }
 };
 
 var onPopupEscPress = function (evt) {
@@ -315,17 +310,21 @@ function setPinLocationToAddress(index) {
 }
 
 pinListElement.onclick = function (evt) {
+  closeOpenedCard();
   var dataIndex = getClickedPin(evt);
-  getCardToDom(pins[dataIndex]);
-  cardListElement.appendChild(cards);
-  setPinLocationToAddress(dataIndex);
+  if (dataIndex) {
+    getCardToDom(pins[dataIndex]);
+    cardListElement.appendChild(cards);
+    setPinLocationToAddress(dataIndex);
+  }
 };
 
 // Задание 17
+var price = adForm.querySelector('#price');
 
 function setMinPrice(value) {
-  adForm.querySelector('#price').setAttribute('min', value);
-  adForm.querySelector('#price').setAttribute('placeholder', value);
+  price.setAttribute('min', value);
+  price.setAttribute('placeholder', value);
 }
 
 var getMinPrice = function (type) {
@@ -340,12 +339,14 @@ var getMinPrice = function (type) {
 
 var accomondationTypeList = document.querySelector('#type');
 
-accomondationTypeList.addEventListener('change', function () {
+function setMinPriceInput() {
   setMinPrice(getMinPrice(getPinType(accomondationTypeList.value)));
+}
+accomondationTypeList.addEventListener('change', function () {
+  setMinPriceInput();
 });
 
-setMinPrice(getMinPrice(getPinType(accomondationTypeList.value)));
-
+setMinPriceInput();
 
 var checkIn = document.getElementById('timein');
 var checkOut = document.getElementById('timeout');
@@ -366,55 +367,71 @@ checkOut.addEventListener('change', function () {
 var roomNumber = document.getElementById('room_number');
 var capacity = document.getElementById('capacity');
 
-var roomsMap = {
+var roomsMapDisabled = {
   1: [0, 1, 3],
   2: [3, 0],
   3: [3],
   100: [1, 2, 0]
 };
+
+var roomsMapSelected = {
+  1: [2],
+  2: [2],
+  3: [2],
+  100: [3]
+};
 var roomNumbersDisablesReset = [0, 1, 2, 3];
 
-function setDisableAttribute(v) {
-  var optionIndexesToDisable = roomsMap[v]; // получаем массив индексов, которые нужно задизейблить
-  optionIndexesToDisable.forEach(function (index) {
-    capacity.children[index].setAttribute('disabled', '');
+function resetRoomNumbers() {
+  roomNumbersDisablesReset.forEach(function (index) {
+    capacity.children[index].removeAttribute('disabled', '');
+    capacity.children[index].removeAttribute('selected', '');
   });
 }
 
-function resetDisables() {
-  roomNumbersDisablesReset.forEach(function (index) {
-    capacity.children[index].removeAttribute('disabled', '');
+function setRoomNumbersValid(v) {
+  roomsMapDisabled[v].forEach(function (index) {
+    capacity.children[index].setAttribute('disabled', '');
+  });
+  roomsMapSelected[v].forEach(function (index) {
+    capacity.children[index].setAttribute('selected', '');
   });
 }
 
 roomNumber.addEventListener('change', function () {
-  resetDisables();
-  var roomNumberValue = roomNumber.value;
-  setDisableAttribute(roomNumberValue);
+  resetRoomNumbers();
+  setRoomNumbersValid(roomNumber.value);
 });
+
+resetRoomNumbers();
+setRoomNumbersValid(roomNumber.value);
 
 var userTitleInput = document.getElementById('title');
 userTitleInput.addEventListener('invalid', function () {
+  var message = '';
   if (userTitleInput.validity.tooShort) {
-    userTitleInput.setCustomValidity('Имя должно состоять минимум из 30-х символов');
+    message = 'Имя должно состоять минимум из 30-х символов';
   } else if (userTitleInput.validity.tooLong) {
-    userTitleInput.setCustomValidity('Имя не должно превышать 100-та символов');
+    message = 'Имя не должно превышать 100-та символов';
   } else if (userTitleInput.validity.valueMissing) {
-    userTitleInput.setCustomValidity('Обязательное поле');
+    message = 'Обязательное поле';
   } else {
-    userTitleInput.setCustomValidity('');
+    message = '';
   }
+  userTitleInput.setCustomValidity(message);
 });
 
 userTitleInput.addEventListener('input', function (evt) {
+  var message = '';
   var target = evt.target;
   if (target.value.length < 30) {
-    target.setCustomValidity('Имя должно состоять минимум из 30-х символов');
+    message = 'Имя должно состоять минимум из 30-х символов';
   } else if (target.value.length > 100) {
-    target.setCustomValidity('Имя не должно превышать 100-та символов');
+    message = 'Имя не должно превышать 100-та символов';
   } else if (userTitleInput.validity.valueMissing) {
-    target.setCustomValidity('Обязательное поле');
+    message = 'Обязательное поле';
   } else {
-    target.setCustomValidity('');
+    message = '';
   }
+  target.setCustomValidity(message);
 });
