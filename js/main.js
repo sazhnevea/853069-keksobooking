@@ -134,7 +134,6 @@ var renderPin = function (pin, index) {
   return pinElement;
 };
 
-
 var fragment = document.createDocumentFragment();
 pins.forEach(function (pin, index) {
   fragment.appendChild(renderPin(pin, index));
@@ -261,9 +260,10 @@ function removeDisabledAttr(element) {
   element.removeAttribute('disabled');
 }
 
-var ellipseHandle = userDialog.querySelector('ellipse');
-var muffinHandle = userDialog.querySelector('img');
+var mainPin = userDialog.querySelector('.map__pin--main');
 
+var hiddenInput = document.getElementById('address_hidden');
+hiddenInput.setAttribute('value', address.placeholder);
 
 function activatePage() {
   adFormFieldset.forEach(removeDisabledAttr);
@@ -272,14 +272,9 @@ function activatePage() {
   adForm.classList.remove('ad-form--disabled');
   address.placeholder = '590, 441';
   addPinsToDom();
-  address.parentNode.setAttribute('disabled', '');
 }
 
-muffinHandle.addEventListener('mouseup', function () {
-  activatePage();
-});
-
-ellipseHandle.addEventListener('mouseup', function () {
+mainPin.addEventListener('mouseup', function () {
   activatePage();
 });
 
@@ -287,7 +282,9 @@ var ESC_KEYCODE = 27;
 
 var closeOpenedCard = function () {
   var closeCard = document.querySelector('.map__card');
-  closeCard.remove();
+  if (closeCard) {
+    closeCard.remove();
+  }
 };
 
 var onPopupEscPress = function (evt) {
@@ -311,17 +308,134 @@ var getClickedPin = function (evt) {
 };
 
 function setPinLocationToAddress(index) {
-  address.placeholder = pins[index].location.x + ', ' + pins[index].location.y;
+  var coordinates = pins[index].location.x + ', ' + pins[index].location.y;
+  address.placeholder = coordinates;
+  hiddenInput.value = coordinates;
 }
 
 pinListElement.onclick = function (evt) {
+  closeOpenedCard();
   var dataIndex = getClickedPin(evt);
-  getCardToDom(pins[dataIndex]);
-  cardListElement.appendChild(cards);
-  // сделать функцию
-  setPinLocationToAddress(dataIndex);
-
-
+  if (dataIndex) {
+    getCardToDom(pins[dataIndex]);
+    cardListElement.appendChild(cards);
+    setPinLocationToAddress(dataIndex);
+  }
 };
 
+// Задание 17
+var price = adForm.querySelector('#price');
 
+function setMinPrice(value) {
+  price.setAttribute('min', value);
+  price.setAttribute('placeholder', value);
+}
+
+var getMinPrice = function (type) {
+  switch (type) {
+    case 'Квартира': return '1000';
+    case 'Бунгало': return '0';
+    case 'Дворец': return '10000';
+    case 'Дом': return '5000';
+    default: throw new Error('Unrecognized type of the type');
+  }
+};
+
+var accomondationTypeList = document.querySelector('#type');
+
+function setMinPriceInput() {
+  setMinPrice(getMinPrice(getPinType(accomondationTypeList.value)));
+}
+accomondationTypeList.addEventListener('change', function () {
+  setMinPriceInput();
+});
+
+setMinPriceInput();
+
+var checkIn = document.getElementById('timein');
+var checkOut = document.getElementById('timeout');
+
+function checkInOutSwitcher(changedElement, elementToChange) {
+  elementToChange.selectedIndex = changedElement.selectedIndex;
+}
+
+checkIn.addEventListener('change', function () {
+  checkInOutSwitcher(checkIn, checkOut);
+});
+
+checkOut.addEventListener('change', function () {
+  checkInOutSwitcher(checkOut, checkIn);
+});
+
+
+var roomNumber = document.getElementById('room_number');
+var capacity = document.getElementById('capacity');
+
+var roomsMapDisabled = {
+  1: [0, 1, 3],
+  2: [3, 0],
+  3: [3],
+  100: [1, 2, 0]
+};
+
+var roomsMapSelected = {
+  1: [2],
+  2: [2],
+  3: [2],
+  100: [3]
+};
+var roomNumbersDisablesReset = [0, 1, 2, 3];
+
+function resetRoomNumbers() {
+  roomNumbersDisablesReset.forEach(function (index) {
+    capacity.children[index].removeAttribute('disabled', '');
+    capacity.children[index].removeAttribute('selected', '');
+  });
+}
+
+function setRoomNumbersValid(v) {
+  roomsMapDisabled[v].forEach(function (index) {
+    capacity.children[index].setAttribute('disabled', '');
+  });
+  roomsMapSelected[v].forEach(function (index) {
+    capacity.children[index].setAttribute('selected', '');
+  });
+}
+
+roomNumber.addEventListener('change', function () {
+  resetRoomNumbers();
+  setRoomNumbersValid(roomNumber.value);
+});
+
+resetRoomNumbers();
+setRoomNumbersValid(roomNumber.value);
+
+var userTitleInput = document.getElementById('title');
+userTitleInput.addEventListener('invalid', function () {
+  var message = '';
+  if (userTitleInput.validity.tooShort) {
+    message = 'Имя должно состоять минимум из 30-х символов';
+  } else if (userTitleInput.validity.tooLong) {
+    message = 'Имя не должно превышать 100-та символов';
+  } else if (userTitleInput.validity.valueMissing) {
+    message = 'Обязательное поле';
+  } else {
+    message = '';
+  }
+  userTitleInput.setCustomValidity(message);
+});
+
+userTitleInput.addEventListener('input', function (evt) {
+  var message = '';
+  var target = evt.target;
+  if (target.value.length < 30) {
+    message = 'Имя должно состоять минимум из 30-х символов';
+  } else if (target.value.length > 100) {
+    message = 'Имя не должно превышать 100-та символов';
+  } else if (userTitleInput.validity.valueMissing) {
+    message = 'Обязательное поле';
+  } else {
+    message = '';
+  }
+  target.setCustomValidity(message);
+});
