@@ -262,10 +262,8 @@ function removeDisabledAttr(element) {
 
 var mainPin = userDialog.querySelector('.map__pin--main');
 
-function addAddressHiddenInput() {
-  var hiddenInput = document.getElementById('address_hidden');
-  hiddenInput.setAttribute('value', address.placeholder);
-}
+var hiddenInput = document.getElementById('address_hidden');
+hiddenInput.setAttribute('value', address.placeholder);
 
 function activatePage() {
   adFormFieldset.forEach(removeDisabledAttr);
@@ -274,8 +272,6 @@ function activatePage() {
   adForm.classList.remove('ad-form--disabled');
   address.placeholder = '590, 441';
   addPinsToDom();
-  address.setAttribute('disabled', '');
-  addAddressHiddenInput();
 }
 
 mainPin.addEventListener('mouseup', function () {
@@ -312,7 +308,9 @@ var getClickedPin = function (evt) {
 };
 
 function setPinLocationToAddress(index) {
-  address.placeholder = pins[index].location.x + ', ' + pins[index].location.y;
+  var coordinates = pins[index].location.x + ', ' + pins[index].location.y;
+  address.placeholder = coordinates;
+  hiddenInput.value = coordinates;
 }
 
 pinListElement.onclick = function (evt) {
