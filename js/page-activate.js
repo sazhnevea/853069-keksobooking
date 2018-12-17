@@ -1,7 +1,7 @@
 'use strict';
 (function () {
   window.addPinsToDom = function () {
-    window.pins.pinListElement.appendChild(window.pins.fragment);
+    window.utils.pinListElement.appendChild(window.utils.fragment);
   };
 
   var address = document.querySelector('#address');
@@ -9,7 +9,6 @@
   var adFormFieldset = adForm.querySelectorAll('fieldset');
   var mapFilters = document.querySelector('.map__filters');
   var mapFiltersSelect = mapFilters.querySelectorAll('select, fieldset');
-  var userDialog = document.querySelector('.map');
 
   function removeDisabledAttr(element) {
     element.removeAttribute('disabled');
@@ -21,7 +20,7 @@
   window.activatePage = function () {
     adFormFieldset.forEach(removeDisabledAttr);
     mapFiltersSelect.forEach(removeDisabledAttr);
-    userDialog.classList.remove('map--faded');
+    window.utils.userDialog.classList.remove('map--faded');
     adForm.classList.remove('ad-form--disabled');
     address.placeholder = '590, 441';
     window.addPinsToDom();

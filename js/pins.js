@@ -96,8 +96,6 @@
 
   // массив объектов меток
   var pins = getPins(window.data.AD_TITLE);
-  var userDialog = document.querySelector('.map');
-  var pinListElement = userDialog.querySelector('.map__pins');
   var pinTemplate = document
                     .querySelector('#pin')
                     .content
@@ -111,9 +109,8 @@
     return pinElement;
   };
 
-  var fragment = document.createDocumentFragment();
   pins.forEach(function (pin, index) {
-    fragment.appendChild(renderPin(pin, index));
+    window.utils.fragment.appendChild(renderPin(pin, index));
   });
 
   window.getClickedPin = function (evt) {
@@ -129,9 +126,6 @@
   };
 
   window.pins = {
-    pinListElement: pinListElement,
-    fragment: fragment,
-    userDialog: userDialog,
     pins: pins
   };
 })();
