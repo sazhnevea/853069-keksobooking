@@ -15,12 +15,6 @@ var addCardToDom = function (card) {
 
 document.addEventListener('keydown', window.onPopupEscPress);
 
-// function setPinLocationToAddress(index) {
-//   var coordinates = pins[index].location.x + ', ' + pins[index].location.y;
-//   window.pageActivate.address.placeholder = coordinates;
-//   hiddenInput.value = coordinates;
-// }
-
 window.pins.pinListElement.onclick = function (evt) {
   window.closeOpenedCard();
   var dataIndex = window.getClickedPin(evt);

@@ -48,7 +48,9 @@
 
       mainPin.style.top = window.changedCoords.y + 'px';
       mainPin.style.left = window.changedCoords.x + 'px';
-      window.pageActivate.address.placeholder = (window.changedCoords.x + 31) + ', ' + (window.changedCoords.y + 84);
+      var newCoords = (window.changedCoords.x + 31) + ', ' + (window.changedCoords.y + 84);
+      window.pageActivate.address.placeholder = newCoords;
+      window.pageActivate.hiddenInput.value = newCoords;
     };
 
     var onMouseUp = function (upEvt) {

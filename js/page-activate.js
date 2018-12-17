@@ -37,6 +37,7 @@
 
   window.pageActivate = {
     address: address,
-    adForm: adForm
+    adForm: adForm,
+    hiddenInput: hiddenInput
   };
 })();
