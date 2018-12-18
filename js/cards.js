@@ -89,4 +89,20 @@
     setAvatar(cardElement, author.avatar);
     return cardElement;
   };
+
+  var addCardToDom = function (card) {
+    return window.utils.fragment.appendChild(window.renderCard(window.utils.cardTemplate, card));
+  };
+
+  window.utils.pinListElement.onclick = function (evt) {
+    window.closeOpenedCard();
+    var dataIndex = window.getClickedPin(evt);
+    if (dataIndex) {
+      addCardToDom(window.pins.pins[dataIndex]);
+      window.utils.pinListElement.appendChild(window.utils.fragment);
+      window.setPinLocationToAddress(dataIndex);
+    }
+  };
+
+
 })();

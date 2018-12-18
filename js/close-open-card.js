@@ -12,4 +12,7 @@
       window.closeOpenedCard();
     }
   };
+
+  document.addEventListener('keydown', window.onPopupEscPress);
+
 })();
