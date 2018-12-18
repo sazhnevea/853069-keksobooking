@@ -46,6 +46,8 @@
       y: mainPin.offsetTop - shift.y
     };
     if (isOnTheBorder(changedCoords, limits)) {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
       return;
     }
 
