@@ -1,14 +1,16 @@
 'use strict';
 (function () {
+  var map = document.querySelector('.map__overlay');
   var mainPin = window.utils.userDialog.querySelector('.map__pin--main');
+  var MAIN_PIN_WIDTH = 62;
+  var MAIN_PIN_HEIGHT = 84;
 
   var limits = {
     top: 130,
-    right: 1350,
+    right: map.offsetWidth + map.offsetLeft - mainPin.offsetWidth,
     bottom: 630,
-    left: 190
+    left: map.offsetLeft
   };
-
   var dragState = {
     startCoords: {
       x: 0,
@@ -17,11 +19,11 @@
     dragged: false
   };
 
-  function isOnTheBorder(moveEvt, value) {
-    var isOnTheBottom = moveEvt.clientY > value.bottom;
-    var isOnTheTop = moveEvt.clientY < value.top;
-    var isOnTheRight = moveEvt.clientX > value.right;
-    var isOnTheLeft = moveEvt.clientX < value.left;
+  function isOnTheBorder(limit, value) {
+    var isOnTheBottom = limit.y > value.bottom;
+    var isOnTheTop = limit.y < value.top;
+    var isOnTheRight = limit.x > value.right;
+    var isOnTheLeft = limit.x < value.left;
     return isOnTheBottom
         || isOnTheTop
         || isOnTheRight
@@ -31,10 +33,6 @@
   function onMouseMove(moveEvt) {
     moveEvt.preventDefault();
     dragState.dragged = true;
-    if (isOnTheBorder(moveEvt, limits)) {
-      return;
-    }
-
     var shift = {
       x: dragState.startCoords.x - moveEvt.clientX,
       y: dragState.startCoords.y - moveEvt.clientY
@@ -47,13 +45,17 @@
       x: mainPin.offsetLeft - shift.x,
       y: mainPin.offsetTop - shift.y
     };
+    if (isOnTheBorder(changedCoords, limits)) {
+      return;
+    }
 
     mainPin.style.top = changedCoords.y + 'px';
     mainPin.style.left = changedCoords.x + 'px';
 
-    var newCoords = (changedCoords.x + 31) + ', ' + (changedCoords.y + 84);
+    var newCoords = (changedCoords.x + MAIN_PIN_WIDTH / 2) + ', ' + (changedCoords.y + MAIN_PIN_HEIGHT);
     window.pageActivate.address.placeholder = newCoords;
     window.pageActivate.hiddenInput.value = newCoords;
+
   }
 
   function onMouseUp(upEvt) {
