@@ -1,8 +1,7 @@
 'use strict';
 (function () {
-// задание 5
-  // функция определения типа жилья метки
-  window.getPinType = function (offerType) {
+
+  window.getApartmentType = function (offerType) {
     switch (offerType) {
       case 'flat': return 'Квартира';
       case 'bungalo': return 'Бунгало';
@@ -29,7 +28,7 @@
 
   function setType(cardElement, type) {
     var typeContext = cardElement.querySelector('.popup__type');
-    typeContext.textContent = window.getPinType(type);
+    typeContext.textContent = window.getApartmentType(type);
   }
 
   function setCapacity(cardElement, rooms, guests) {
@@ -68,7 +67,7 @@
     avatarURL.setAttribute('src', avatar);
   }
 
-  window.renderCard = function (template, pin) {
+  var renderCard = function (template, pin) {
     function removeCard() {
       cardElement.removeEventListener('click', removeCard);
       cardElement.remove();
@@ -91,18 +90,31 @@
   };
 
   var addCardToDom = function (card) {
-    return window.utils.fragment.appendChild(window.renderCard(window.utils.cardTemplate, card));
+    return window.utils.fragment.appendChild(renderCard(window.utils.cardTemplate, card));
+  };
+  var closeOpenedCard = function () {
+    var closeCard = document.querySelector('.map__card');
+    if (closeCard) {
+      closeCard.remove();
+    }
   };
 
   window.utils.pinListElement.onclick = function (evt) {
-    window.closeOpenedCard();
+    closeOpenedCard();
     var dataIndex = window.getClickedPin(evt);
     if (dataIndex) {
       addCardToDom(window.pins.pins[dataIndex]);
       window.utils.pinListElement.appendChild(window.utils.fragment);
-      window.setPinLocationToAddress(dataIndex);
+      window.setPinLocationToForm(dataIndex);
     }
   };
 
+  var onPopupEscPress = function (evt) {
+    if (evt.keyCode === window.const.ESC_KEYCODE) {
+      closeOpenedCard();
+    }
+  };
+
+  document.addEventListener('keydown', onPopupEscPress);
 
 })();

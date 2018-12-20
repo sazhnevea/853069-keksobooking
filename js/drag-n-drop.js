@@ -1,13 +1,12 @@
 'use strict';
 (function () {
   var map = document.querySelector('.map__overlay');
-  var mainPin = window.utils.userDialog.querySelector('.map__pin--main');
   var MAIN_PIN_WIDTH = 62;
   var MAIN_PIN_HEIGHT = 84;
 
   var limits = {
     top: 130,
-    right: map.offsetWidth + map.offsetLeft - mainPin.offsetWidth,
+    right: map.offsetWidth + map.offsetLeft - window.utils.mainPin.offsetWidth,
     bottom: 630,
     left: map.offsetLeft
   };
@@ -42,8 +41,8 @@
     dragState.startCoords.y = moveEvt.clientY;
 
     var changedCoords = {
-      x: mainPin.offsetLeft - shift.x,
-      y: mainPin.offsetTop - shift.y
+      x: window.utils.mainPin.offsetLeft - shift.x,
+      y: window.utils.mainPin.offsetTop - shift.y
     };
     if (isOnTheBorder(changedCoords, limits)) {
       document.removeEventListener('mousemove', onMouseMove);
@@ -51,13 +50,12 @@
       return;
     }
 
-    mainPin.style.top = changedCoords.y + 'px';
-    mainPin.style.left = changedCoords.x + 'px';
+    window.utils.mainPin.style.top = changedCoords.y + 'px';
+    window.utils.mainPin.style.left = changedCoords.x + 'px';
 
     var newCoords = (changedCoords.x + MAIN_PIN_WIDTH / 2) + ', ' + (changedCoords.y + MAIN_PIN_HEIGHT);
-    window.pageActivate.address.placeholder = newCoords;
-    window.pageActivate.hiddenInput.value = newCoords;
-
+    window.utils.address.placeholder = newCoords;
+    window.utils.hiddenInput.value = newCoords;
   }
 
   function onMouseUp(upEvt) {
@@ -68,14 +66,13 @@
     if (dragState.dragged) {
       var onClickPreventDefault = function (draggedEvt) {
         draggedEvt.preventDefault();
-        mainPin.removeEventListener('click', onClickPreventDefault);
+        window.utils.mainPin.removeEventListener('click', onClickPreventDefault);
       };
-      mainPin.addEventListener('click', onClickPreventDefault);
+      window.utils.mainPin.addEventListener('click', onClickPreventDefault);
     }
   }
 
-  mainPin.addEventListener('mousedown', function (evt) {
-    window.activatePage();
+  window.utils.mainPin.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
 
     dragState.startCoords.x = evt.clientX;
