@@ -9,16 +9,16 @@
     element.removeAttribute('disabled');
   }
 
-  window.activatePage = function () {
+  function activatePage() {
     adFormFieldset.forEach(removeDisabledAttr);
     mapFiltersSelect.forEach(removeDisabledAttr);
-    window.utils.userDialog.classList.remove('map--faded');
+    window.domElements.userDialog.classList.remove('map--faded');
     adForm.classList.remove('ad-form--disabled');
-    window.utils.address.placeholder = '590, 441';
-    window.addPinsToDom();
-  };
+    window.domElements.address.placeholder = window.form.defaultCoords;
+    window.pins.addPinsToDom();
+  }
 
-  window.utils.mainPin.addEventListener('click', window.activatePage);
+  window.domElements.mainPin.addEventListener('click', activatePage);
 
   window.pageActivate = {
     adForm: adForm,

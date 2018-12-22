@@ -13,7 +13,7 @@
                     .querySelector('.map__card');
 
 
-  window.utils = {
+  window.domElements = {
     userDialog: userDialog,
     fragment: fragment,
     cardTemplate: cardTemplate,

@@ -38,7 +38,7 @@
   };
 
   function setMinPriceInput() {
-    setMinPrice(getMinPrice(window.getApartmentType(accomondationTypeList.value)));
+    setMinPrice(getMinPrice(window.cards.getApartmentType(accomondationTypeList.value)));
   }
   accomondationTypeList.addEventListener('change', function () {
     setMinPriceInput();
@@ -111,13 +111,20 @@
     target.setCustomValidity(message);
   });
 
-  window.utils.address.placeholder = defaultCoords;
-  window.utils.hiddenInput.value = defaultCoords;
+  window.domElements.address.placeholder = defaultCoords;
+  window.domElements.hiddenInput.value = defaultCoords;
 
-  window.setPinLocationToForm = function (index) {
-    var coordinates = window.pins.pins[index].location.x + ', ' + window.pins.pins[index].location.y;
-    window.utils.address.placeholder = coordinates;
-    window.utils.hiddenInput.value = coordinates;
+  function setPinLocationToForm(index) {
+    window.load(function (data) {
+      var coordinates = data[index].location.x + ', ' + data[index].location.y;
+      window.domElements.address.placeholder = coordinates;
+      window.domElements.hiddenInput.value = coordinates;
+    });
+  }
+
+  window.form = {
+    setPinLocationToForm: setPinLocationToForm,
+    defaultCoords: defaultCoords
   };
 
 })();
