@@ -1,11 +1,12 @@
 'use strict';
 (function () {
 
-  // массив объектов меток
+  var mainPin = document.querySelector('.map__pin--main');
   var pinTemplate = document
                     .querySelector('#pin')
                     .content
                     .querySelector('.map__pin');
+
   var renderPin = function (pin, index) {
     var pinElement = pinTemplate.cloneNode(true);
     pinElement.setAttribute('data-index', index);
@@ -40,8 +41,16 @@
     return dataIndex;
   }
 
+  function getPinCoordinates(index) {
+    window.load(function (data) {
+      return data[index].location.x + ', ' + data[index].location.y;
+    });
+  }
+
   window.pins = {
     addPinsToDom: addPinsToDom,
-    getClickedPin: getClickedPin
+    getClickedPin: getClickedPin,
+    mainPin: mainPin,
+    getPinCoordinates: getPinCoordinates
   };
 })();

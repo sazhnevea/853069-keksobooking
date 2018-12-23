@@ -3,10 +3,11 @@
   var map = document.querySelector('.map__overlay');
   var MAIN_PIN_WIDTH = 62;
   var MAIN_PIN_HEIGHT = 84;
+  var mainPin = window.pins.mainPin;
 
   var limits = {
     top: 130,
-    right: map.offsetWidth + map.offsetLeft - window.domElements.mainPin.offsetWidth,
+    right: map.offsetWidth + map.offsetLeft - mainPin.offsetWidth,
     bottom: 630,
     left: map.offsetLeft
   };
@@ -41,8 +42,8 @@
     dragState.startCoords.y = moveEvt.clientY;
 
     var changedCoords = {
-      x: window.domElements.mainPin.offsetLeft - shift.x,
-      y: window.domElements.mainPin.offsetTop - shift.y
+      x: mainPin.offsetLeft - shift.x,
+      y: mainPin.offsetTop - shift.y
     };
     if (isOnTheBorder(changedCoords, limits)) {
       document.removeEventListener('mousemove', onMouseMove);
@@ -50,12 +51,12 @@
       return;
     }
 
-    window.domElements.mainPin.style.top = changedCoords.y + 'px';
-    window.domElements.mainPin.style.left = changedCoords.x + 'px';
+    mainPin.style.top = changedCoords.y + 'px';
+    mainPin.style.left = changedCoords.x + 'px';
 
     var newCoords = (changedCoords.x + MAIN_PIN_WIDTH / 2) + ', ' + (changedCoords.y + MAIN_PIN_HEIGHT);
-    window.domElements.address.placeholder = newCoords;
-    window.domElements.hiddenInput.value = newCoords;
+    window.form.setAddress(newCoords);
+
   }
 
   function onMouseUp(upEvt) {
@@ -66,13 +67,13 @@
     if (dragState.dragged) {
       var onClickPreventDefault = function (draggedEvt) {
         draggedEvt.preventDefault();
-        window.domElements.mainPin.removeEventListener('click', onClickPreventDefault);
+        mainPin.removeEventListener('click', onClickPreventDefault);
       };
-      window.domElements.mainPin.addEventListener('click', onClickPreventDefault);
+      mainPin.addEventListener('click', onClickPreventDefault);
     }
   }
 
-  window.domElements.mainPin.addEventListener('mousedown', function (evt) {
+  mainPin.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
 
     dragState.startCoords.x = evt.clientX;

@@ -14,11 +14,11 @@
     mapFiltersSelect.forEach(removeDisabledAttr);
     window.domElements.userDialog.classList.remove('map--faded');
     adForm.classList.remove('ad-form--disabled');
-    window.domElements.address.placeholder = window.form.defaultCoords;
+    window.form.setDefaultAddress();
     window.pins.addPinsToDom();
   }
 
-  window.domElements.mainPin.addEventListener('click', activatePage);
+  window.pins.mainPin.addEventListener('click', activatePage);
 
   window.pageActivate = {
     adForm: adForm,

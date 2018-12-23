@@ -1,6 +1,11 @@
 'use strict';
 (function () {
 
+  var cardTemplate = document
+                    .querySelector('#card')
+                    .content
+                    .querySelector('.map__card');
+
   function getApartmentType(offerType) {
     switch (offerType) {
       case 'flat': return 'Квартира';
@@ -95,7 +100,7 @@
   };
 
   var createCardToDom = function (card) {
-    return window.domElements.fragment.appendChild(renderCard(window.domElements.cardTemplate, card));
+    return window.domElements.fragment.appendChild(renderCard(cardTemplate, card));
   };
   var closeOpenedCard = function () {
     var closeCard = document.querySelector('.map__card');
@@ -112,11 +117,11 @@
 
   document.addEventListener('keydown', onPopupEscPress);
 
-// получить данные один раз.
+  // получить данные один раз.
   window.domElements.pinListElement.onclick = function (evt) {
-    closeOpenedCard();
     var dataIndex = window.pins.getClickedPin(evt);
     if (dataIndex) {
+      closeOpenedCard();
       window.load(function (data) {
         createCardToDom(data[dataIndex]);
         window.domElements.pinListElement.appendChild(window.domElements.fragment);
@@ -124,7 +129,6 @@
       });
     }
   };
-
 
   window.cards = {
     getApartmentType: getApartmentType

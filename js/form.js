@@ -8,6 +8,15 @@
   var roomNumber = document.getElementById('room_number');
   var capacity = document.getElementById('capacity');
   var defaultCoords = '590, 395';
+  var address = document.querySelector('#address');
+  var hiddenInput = document.getElementById('address_hidden');
+  var description = document.getElementById('description');
+  var descriptionDefault = description.placeholder;
+  var features = document
+                 .getElementById('features');
+  var checkboxes = features.querySelectorAll('input');
+  // var error = document.getElementById('error');
+
   var roomsMapDisabled = {
     1: [0, 1, 3],
     2: [3, 0],
@@ -50,6 +59,11 @@
     elementToChange.selectedIndex = changedElement.selectedIndex;
   }
 
+  function checkInOutSwitcherDefault(elementOne, elementTwo) {
+    elementOne.selectedIndex = '0';
+    elementTwo.selectedIndex = '0';
+  }
+
   checkIn.addEventListener('change', function () {
     checkInOutSwitcher(checkIn, checkOut);
   });
@@ -82,6 +96,37 @@
   resetRoomGuestsValue();
   setRoomNumbersValidation(roomNumber.value);
 
+
+
+  function setCheckboxDefault (elements) {
+    checkboxes.forEach(function (element) {
+      if (element.checked) {
+        element.checked = false;
+      }
+    });
+  }
+
+  window.formDefaultValues = {
+    title: userTitleInput.value,
+    minPrice: price.value,
+    apartmentTypeValue: accomondationTypeList.selectedIndex,
+    roomNumberIndex: roomNumber.selectedIndex,
+    capacity: capacity.selectedIndex
+  };
+
+  function setFormDefaultValues(formDefaultValues) {
+    userTitleInput.value = formDefaultValues.title;
+    price.value = formDefaultValues.minPrice;
+    accomondationTypeList.selectedIndex = formDefaultValues.apartmentTypeValue;
+    roomNumber.selectedIndex = formDefaultValues.roomNumberIndex;
+    capacity.selectedIndex = formDefaultValues.capacity;
+    description.value = '';
+    description.placeholder = descriptionDefault;
+    setDefaultAddress();
+    checkInOutSwitcherDefault(checkIn, checkOut);
+    setCheckboxDefault(checkboxes);
+  }
+
   userTitleInput.addEventListener('invalid', function () {
     var message = '';
     if (userTitleInput.validity.tooShort) {
@@ -111,20 +156,24 @@
     target.setCustomValidity(message);
   });
 
-  window.domElements.address.placeholder = defaultCoords;
-  window.domElements.hiddenInput.value = defaultCoords;
+  function setAddress(coords) {
+    address.placeholder = coords;
+    hiddenInput.value = coords;
+  }
+  function setDefaultAddress() {
+    setAddress(defaultCoords);
+  }
 
   function setPinLocationToForm(index) {
-    window.load(function (data) {
-      var coordinates = data[index].location.x + ', ' + data[index].location.y;
-      window.domElements.address.placeholder = coordinates;
-      window.domElements.hiddenInput.value = coordinates;
-    });
+    setAddress(window.pins.getPinCoordinates(index));
   }
 
   window.form = {
     setPinLocationToForm: setPinLocationToForm,
-    defaultCoords: defaultCoords
+    defaultCoords: defaultCoords,
+    setAddress: setAddress,
+    setDefaultAddress: setDefaultAddress,
+    setFormDefaultValues: setFormDefaultValues
   };
 
 })();
