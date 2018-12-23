@@ -1,6 +1,8 @@
 'use strict';
 (function () {
 
+  var mainPin = document.querySelector('.map__pin--main');
+
   var getAuthorContent = function (index) {
     var AuthorContent = {};
     AuthorContent.avatar = 'img/avatars/user0' + index + '.png';
@@ -92,6 +94,7 @@
   window.pins = {
     addPinsToDom: addPinsToDom,
     getClickedPin: getClickedPin,
-    pins: pins
+    pins: pins,
+    mainPin: mainPin
   };
 })();

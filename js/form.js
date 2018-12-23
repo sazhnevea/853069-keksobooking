@@ -8,6 +8,10 @@
   var roomNumber = document.getElementById('room_number');
   var capacity = document.getElementById('capacity');
   var defaultCoords = '590, 395';
+  var address = document.querySelector('#address');
+  var hiddenInput = document.getElementById('address_hidden');
+
+
   var roomsMapDisabled = {
     1: [0, 1, 3],
     2: [3, 0],
@@ -111,18 +115,22 @@
     target.setCustomValidity(message);
   });
 
-  window.domElements.address.placeholder = defaultCoords;
-  window.domElements.hiddenInput.value = defaultCoords;
+  function setAddress(coords) {
+    address.placeholder = coords;
+    hiddenInput.value = coords;
+  }
+
+  setAddress(defaultCoords);
 
   function setPinLocationToForm(index) {
     var coordinates = window.pins.pins[index].location.x + ', ' + window.pins.pins[index].location.y;
-    window.domElements.address.placeholder = coordinates;
-    window.domElements.hiddenInput.value = coordinates;
+    setAddress(coordinates);
   }
 
   window.form = {
     setPinLocationToForm: setPinLocationToForm,
-    defaultCoords: defaultCoords
+    defaultCoords: defaultCoords,
+    setAddress: setAddress,
   };
 
 })();
