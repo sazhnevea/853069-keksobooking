@@ -1,9 +1,9 @@
 'use strict';
 (function () {
   var map = document.querySelector('.map__overlay');
-  var mainPin = window.utils.userDialog.querySelector('.map__pin--main');
   var MAIN_PIN_WIDTH = 62;
   var MAIN_PIN_HEIGHT = 84;
+  var mainPin = window.pins.mainPin;
 
   var limits = {
     top: 130,
@@ -55,8 +55,7 @@
     mainPin.style.left = changedCoords.x + 'px';
 
     var newCoords = (changedCoords.x + MAIN_PIN_WIDTH / 2) + ', ' + (changedCoords.y + MAIN_PIN_HEIGHT);
-    window.pageActivate.address.placeholder = newCoords;
-    window.pageActivate.hiddenInput.value = newCoords;
+    window.form.setAddress(newCoords);
 
   }
 
@@ -75,7 +74,6 @@
   }
 
   mainPin.addEventListener('mousedown', function (evt) {
-    window.activatePage();
     evt.preventDefault();
 
     dragState.startCoords.x = evt.clientX;

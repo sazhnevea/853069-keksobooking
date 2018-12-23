@@ -1,8 +1,12 @@
 'use strict';
 (function () {
-// задание 5
-  // функция определения типа жилья метки
-  window.getPinType = function (offerType) {
+
+  var cardTemplate = document
+                    .querySelector('#card')
+                    .content
+                    .querySelector('.map__card');
+
+  function getApartmentType(offerType) {
     switch (offerType) {
       case 'flat': return 'Квартира';
       case 'bungalo': return 'Бунгало';
@@ -10,7 +14,7 @@
       case 'house': return 'Дом';
       default: throw new Error('Unregognized type of the offer');
     }
-  };
+  }
 
   function setTitle(cardElement, title) {
     var titleContext = cardElement.querySelector('.popup__title');
@@ -29,7 +33,7 @@
 
   function setType(cardElement, type) {
     var typeContext = cardElement.querySelector('.popup__type');
-    typeContext.textContent = window.getPinType(type);
+    typeContext.textContent = getApartmentType(type);
   }
 
   function setCapacity(cardElement, rooms, guests) {
@@ -43,8 +47,13 @@
   }
 
   function setFeatures(cardElement, features) {
-    var featuresContext = cardElement.querySelector('.popup__features');
-    featuresContext.textContent = features;
+    var featureElements = cardElement.querySelectorAll('.popup__feature');
+    featureElements.forEach(function (element) {
+      element.classList.add('visually-hidden');
+    });
+    features.forEach(function (value) {
+      cardElement.querySelector('.popup__feature--' + value).classList.remove('visually-hidden');
+    });
   }
 
   function setDescription(cardElement, description) {
@@ -68,7 +77,7 @@
     avatarURL.setAttribute('src', avatar);
   }
 
-  window.renderCard = function (template, pin) {
+  var renderCard = function (template, pin) {
     function removeCard() {
       cardElement.removeEventListener('click', removeCard);
       cardElement.remove();
@@ -89,4 +98,38 @@
     setAvatar(cardElement, author.avatar);
     return cardElement;
   };
+
+  var createCardToDom = function (card) {
+    return window.domElements.fragment.appendChild(renderCard(cardTemplate, card));
+  };
+  var closeOpenedCard = function () {
+    var closeCard = document.querySelector('.map__card');
+    if (closeCard) {
+      closeCard.remove();
+    }
+  };
+
+  var onPopupEscPress = function (evt) {
+    if (evt.keyCode === window.const.ESC_KEYCODE) {
+      closeOpenedCard();
+    }
+  };
+
+  document.addEventListener('keydown', onPopupEscPress);
+
+  // получить данные один раз.
+  window.domElements.pinListElement.onclick = function (evt) {
+    var dataIndex = window.pins.getClickedPin(evt);
+    if (dataIndex) {
+      closeOpenedCard();
+      createCardToDom(window.pins.pins[dataIndex]);
+      window.domElements.pinListElement.appendChild(window.domElements.fragment);
+      window.form.setPinLocationToForm(dataIndex);
+    }
+  };
+
+  window.cards = {
+    getApartmentType: getApartmentType
+  };
+
 })();
