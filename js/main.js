@@ -14,7 +14,7 @@
     mapFiltersSelect.forEach(removeDisabledAttr);
     window.domElements.userDialog.classList.remove('map--faded');
     adForm.classList.remove('ad-form--disabled');
-    window.form.setAddress(window.form.defaultCoords);
+    window.form.setDefaultAddress();
     window.pins.addPinsToDom();
   }
 

@@ -10,8 +10,8 @@
   };
   var getLocationContent = function () {
     return {
-      x: window.getRandomNumber(130, 630) - 20,
-      y: window.getRandomNumber(130, 730) - 40
+      x: window.randoms.getRandomNumber(130, 630) - 20,
+      y: window.randoms.getRandomNumber(130, 730) - 40
     };
   };
 
@@ -20,19 +20,19 @@
     offerContent.title = title;
     var location = getLocationContent();
     offerContent.address = location.x + ', ' + location.y;
-    offerContent.price = window.getRandomNumber(1000, 1000000);
-    offerContent.type = window.getRandomElement(window.data.AD_TYPE);
-    offerContent.rooms = window.getRandomNumber(1, 5);
-    offerContent.guests = window.getRandomNumber(1, 10);
-    offerContent.checkin = window.getRandomElement(window.data.AD_CHECKIN);
-    offerContent.checkout = window.getRandomElement(window.data.AD_CHECKOUT);
+    offerContent.price = window.randoms.getRandomNumber(1000, 1000000);
+    offerContent.type = window.randoms.getRandomElement(window.data.AD_TYPE);
+    offerContent.rooms = window.randoms.getRandomNumber(1, 5);
+    offerContent.guests = window.randoms.getRandomNumber(1, 10);
+    offerContent.checkin = window.randoms.getRandomElement(window.data.AD_CHECKIN);
+    offerContent.checkout = window.randoms.getRandomElement(window.data.AD_CHECKOUT);
     var features = [];
-    for (var i = 0; i < window.getRandomNumber(0, window.data.AD_FEATURES.length - 1); i++) {
+    for (var i = 0; i < window.randoms.getRandomNumber(0, window.data.AD_FEATURES.length - 1); i++) {
       features.push(window.data.AD_FEATURES[i]);
     }
     offerContent.features = features;
     offerContent.description = '';
-    var photoIndexes = window.generateArrayRandomNumber(0, window.data.AD_PHOTOS.length - 1);
+    var photoIndexes = window.randoms.generateArrayRandomNumber(0, window.data.AD_PHOTOS.length - 1);
     var photos = photoIndexes.map(function (photoIndex) {
       return window.data.AD_PHOTOS[photoIndex];
     });
@@ -91,10 +91,15 @@
     return dataIndex;
   }
 
+  function getPinCoordinates(index) {
+    return pins[index].location.x + ', ' + pins[index].location.y;
+  }
+
   window.pins = {
     addPinsToDom: addPinsToDom,
     getClickedPin: getClickedPin,
     pins: pins,
-    mainPin: mainPin
+    mainPin: mainPin,
+    getPinCoordinates: getPinCoordinates
   };
 })();

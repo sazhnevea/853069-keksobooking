@@ -119,18 +119,19 @@
     address.placeholder = coords;
     hiddenInput.value = coords;
   }
-
-  setAddress(defaultCoords);
+  function setDefaultAddress() {
+    setAddress(defaultCoords);
+  }
 
   function setPinLocationToForm(index) {
-    var coordinates = window.pins.pins[index].location.x + ', ' + window.pins.pins[index].location.y;
-    setAddress(coordinates);
+    setAddress(window.pins.getPinCoordinates(index));
   }
 
   window.form = {
     setPinLocationToForm: setPinLocationToForm,
     defaultCoords: defaultCoords,
     setAddress: setAddress,
+    setDefaultAddress: setDefaultAddress
   };
 
 })();
