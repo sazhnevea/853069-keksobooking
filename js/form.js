@@ -115,11 +115,9 @@
   window.domElements.hiddenInput.value = defaultCoords;
 
   function setPinLocationToForm(index) {
-    window.load(function (data) {
-      var coordinates = data[index].location.x + ', ' + data[index].location.y;
-      window.domElements.address.placeholder = coordinates;
-      window.domElements.hiddenInput.value = coordinates;
-    });
+    var coordinates = window.pins.pins[index].location.x + ', ' + window.pins.pins[index].location.y;
+    window.domElements.address.placeholder = coordinates;
+    window.domElements.hiddenInput.value = coordinates;
   }
 
   window.form = {

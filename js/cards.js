@@ -112,19 +112,16 @@
 
   document.addEventListener('keydown', onPopupEscPress);
 
-// получить данные один раз.
+  // получить данные один раз.
   window.domElements.pinListElement.onclick = function (evt) {
-    closeOpenedCard();
     var dataIndex = window.pins.getClickedPin(evt);
     if (dataIndex) {
-      window.load(function (data) {
-        createCardToDom(data[dataIndex]);
-        window.domElements.pinListElement.appendChild(window.domElements.fragment);
-        window.form.setPinLocationToForm(dataIndex);
-      });
+      closeOpenedCard();
+      createCardToDom(window.pins.pins[dataIndex]);
+      window.domElements.pinListElement.appendChild(window.domElements.fragment);
+      window.form.setPinLocationToForm(dataIndex);
     }
   };
-
 
   window.cards = {
     getApartmentType: getApartmentType
