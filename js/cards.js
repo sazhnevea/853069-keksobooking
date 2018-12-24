@@ -117,16 +117,13 @@
 
   document.addEventListener('keydown', onPopupEscPress);
 
-  // получить данные один раз.
   window.domElements.pinListElement.onclick = function (evt) {
-    var dataIndex = window.pins.getClickedPin(evt);
-    if (dataIndex) {
+    var pinIndex = window.pins.getClickedPin(evt);
+    if (pinIndex) {
       closeOpenedCard();
-      window.load(function (data) {
-        createCardToDom(data[dataIndex]);
-        window.domElements.pinListElement.appendChild(window.domElements.fragment);
-        window.form.setPinLocationToForm(dataIndex);
-      });
+      createCardToDom(window.pinsData[pinIndex]);
+      window.domElements.pinListElement.appendChild(window.domElements.fragment);
+      window.form.setPinLocationToForm(pinIndex);
     }
   };
 

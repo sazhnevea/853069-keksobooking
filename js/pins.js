@@ -16,13 +16,15 @@
     return pinElement;
   };
 
-  window.load(function (data) {
-    var pins = data;
+  window.load(function (pins) {
+    window.pinsData = pins;
     pins.forEach(function (pin, index) {
       if (pin.hasOwnProperty('offer')) {
         window.domElements.fragment.appendChild(renderPin(pin, index));
       }
     });
+  }, function () {
+    window.form.showErrorAd();
   });
 
   function addPinsToDom() {

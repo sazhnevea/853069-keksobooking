@@ -1,21 +1,44 @@
 'use strict';
 (function () {
-  var userTitleInput = document.getElementById('title');
-  var price = window.pageActivate.adForm.querySelector('#price');
-  var accomondationTypeList = document.querySelector('#type');
-  var checkIn = document.getElementById('timein');
-  var checkOut = document.getElementById('timeout');
-  var roomNumber = document.getElementById('room_number');
-  var capacity = document.getElementById('capacity');
+  var userTitleInput = document
+                       .getElementById('title');
+  var price = window.pageActivate
+              .adForm.querySelector('#price');
+  var accomondationTypeList = document
+                              .querySelector('#type');
+  var checkIn = document
+                .getElementById('timein');
+  var checkOut = document
+                 .getElementById('timeout');
+  var roomNumber = document
+                   .getElementById('room_number');
+  var capacity = document
+                 .getElementById('capacity');
   var defaultCoords = '590, 395';
-  var address = document.querySelector('#address');
-  var hiddenInput = document.getElementById('address_hidden');
-  var description = document.getElementById('description');
+  var address = document
+                .querySelector('#address');
+  var hiddenInput = document
+                    .getElementById('address_hidden');
+  var description = document
+                    .getElementById('description');
   var descriptionDefault = description.placeholder;
   var features = document
                  .getElementById('features');
-  var checkboxes = features.querySelectorAll('input');
-  // var error = document.getElementById('error');
+  var checkboxes = features
+  .querySelectorAll('input');
+  var form = document
+            .querySelector('.ad-form--disabled');
+
+  var successMessage = document
+                  .getElementById('success')
+                  .content.querySelector('.success')
+                  .cloneNode(true);
+
+  var errorMessage = document
+                .getElementById('error')
+                .content
+                .querySelector('.error')
+                .cloneNode(true);
 
   var roomsMapDisabled = {
     1: [0, 1, 3],
@@ -96,9 +119,7 @@
   resetRoomGuestsValue();
   setRoomNumbersValidation(roomNumber.value);
 
-
-
-  function setCheckboxDefault (elements) {
+  function setCheckboxDefault() {
     checkboxes.forEach(function (element) {
       if (element.checked) {
         element.checked = false;
@@ -106,7 +127,7 @@
     });
   }
 
-  window.formDefaultValues = {
+  var formDefaultValues = {
     title: userTitleInput.value,
     minPrice: price.value,
     apartmentTypeValue: accomondationTypeList.selectedIndex,
@@ -114,12 +135,12 @@
     capacity: capacity.selectedIndex
   };
 
-  function setFormDefaultValues(formDefaultValues) {
-    userTitleInput.value = formDefaultValues.title;
-    price.value = formDefaultValues.minPrice;
-    accomondationTypeList.selectedIndex = formDefaultValues.apartmentTypeValue;
-    roomNumber.selectedIndex = formDefaultValues.roomNumberIndex;
-    capacity.selectedIndex = formDefaultValues.capacity;
+  function setFormDefaultValues(values) {
+    userTitleInput.value = values.title;
+    price.value = values.minPrice;
+    accomondationTypeList.selectedIndex = values.apartmentTypeValue;
+    roomNumber.selectedIndex = values.roomNumberIndex;
+    capacity.selectedIndex = values.capacity;
     description.value = '';
     description.placeholder = descriptionDefault;
     setDefaultAddress();
@@ -168,12 +189,41 @@
     setAddress(window.pins.getPinCoordinates(index));
   }
 
+  function showSuccessAd() {
+    document.querySelector('main').appendChild(successMessage);
+    setTimeout(function () {
+      successMessage.remove();
+    }, 3000);
+  }
+
+
+  function showErrorAd() {
+    document.querySelector('main').appendChild(errorMessage);
+    var errorButton = document
+                       .querySelector('.error__button');
+    errorButton.addEventListener('click', function () {
+      errorMessage.remove();
+    });
+  }
+
+  form.addEventListener('submit', function (evt) {
+    evt.preventDefault();
+    window.upload(new FormData(form), function () {
+      showSuccessAd();
+      setFormDefaultValues(formDefaultValues);
+    }, function () {
+      showErrorAd();
+      setFormDefaultValues(formDefaultValues);
+    });
+  });
+
+
   window.form = {
     setPinLocationToForm: setPinLocationToForm,
     defaultCoords: defaultCoords,
     setAddress: setAddress,
     setDefaultAddress: setDefaultAddress,
-    setFormDefaultValues: setFormDefaultValues
+    showErrorAd: showErrorAd
   };
 
 })();
